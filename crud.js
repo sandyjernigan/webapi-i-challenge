@@ -1,53 +1,17 @@
-
-
-// C - Create
-// POST 	/api/users 	Creates a user using the information sent inside the request body.
-
-
-// GET    /api/users 	Returns an array of all the user objects contained in the database.
 // GET    /api/users/:id 	Returns the user object with the specified id.
 // DELETE /api/users/:id 	Removes the user with the specified id and returns the deleted user.
 // PUT    /api/users/:id 	Updates the user with the specified id using data from the request body. Returns the modified document, NOT the original.
-
-
-// Database access
 
 // Database access will be done using the db.js file included inside the data folder. This file publishes the following methods:
 
 //     find(): calling find returns a promise that resolves to an array of all the users contained in the database.
 //     findById(): this method expects an id as it's only parameter and returns the user corresponding to the id provided or an empty array if no user with that id is found.
 //     insert(): calling insert passing it a user object will add it to the database and return an object with the id of the inserted user. The object looks like this: { id: 123 }.
-//     update(): accepts two arguments, the first is the id of the user to update and the second is an object with the changes to apply. It returns the count of updated records. If the count is 1 it means the record was updated correctly.
-//     remove(): the remove method accepts an id as it's first parameter and upon successfully deleting the user from the database it returns the number of records deleted.
-// Now that we have a way to add, update, remove and retrieve data from the provided database, it is time to work on the API.
 
-// User Schema
-// Users in the database conform to the following object structure:
-// {
-//   name: "Jane Doe", // String, required
-//   bio: "Not Tarzan's Wife, another Jane",  // String
-//   created_at: Mon Aug 14 2017 12:50:16 GMT-0700 (PDT) // Date, defaults to current date
-//   updated_at: Mon Aug 14 2017 12:50:16 GMT-0700 (PDT) // Date, defaults to current date
-// }
+//     remove(): the remove method accepts an id as it's first parameter and upon successfully deleting the user from the database it returns the number of records deleted.
+
 
 // Endpoint Specifications
-
-// When the client makes a POST request to /api/users:
-
-//     If the request body is missing the name or bio property:
-//         cancel the request.
-//         respond with HTTP status code 400 (Bad Request).
-//         return the following JSON response: { errorMessage: "Please provide name and bio for the user." }.
-
-//     If the information about the user is valid:
-//         save the new user the the database.
-//         return HTTP status code 201 (Created).
-//         return the newly created user document.
-
-//     If there's an error while saving the user:
-//         cancel the request.
-//         respond with HTTP status code 500 (Server Error).
-//         return the following JSON object: { error: "There was an error while saving the user to the database" }.
 
 // When the client makes a GET request to /api/users:
 
