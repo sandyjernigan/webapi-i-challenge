@@ -20,8 +20,8 @@ server.get('/', (req, res) => {
   const userSchema = {
     "name": "Jane Doe", // String, required
     "bio": "Not Tarzan's Wife, another Jane",  // String
-    "created_at": Mon Aug 14 2017 12:50:16 GMT-0700 (PDT), // Date, defaults to current date
-    "updated_at": Mon Aug 14 2017 12:50:16 GMT-0700 (PDT) // Date, defaults to current date
+    //"created_at": Mon Aug 14 2017 12:50:16 GMT-0700 (PDT), // Date, defaults to current date
+    //"updated_at": Mon Aug 14 2017 12:50:16 GMT-0700 (PDT) // Date, defaults to current date
   }
 
 // Create - POST - Creates a user using the information sent inside the request body.
@@ -68,6 +68,26 @@ server.post('/api/users', (req, res) => {
       })
     })
 })
+
+// Read - GET - Returns an array of all the user objects contained in the database.
+server.get('/api/users', (req, res) => {
+  // When the client makes a GET request to /api/users:
+  db.find() // find(): calling find returns a promise that resolves to an array of all the users contained in the database.
+    .then(hubs => {
+      res.json(hubs);
+    })
+    // If there's an error in retrieving the users from the database:
+    .catch(err => {
+      // cancel the request and  respond with HTTP status code 500.
+      res.status(500).json({
+        err: err,
+        // return the following JSON object: { error: "The users information could not be retrieved." }.
+        error: "The users information could not be retrieved." 
+      })
+    })
+})
+
+
 
 
 // Setup Server Listen, this should be the last step
