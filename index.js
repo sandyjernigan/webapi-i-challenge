@@ -72,7 +72,8 @@ server.post('/api/users', (req, res) => {
 // Read - GET - Returns an array of all the user objects contained in the database.
 server.get('/api/users', (req, res) => {
   // When the client makes a GET request to /api/users:
-  db.find() // find(): calling find returns a promise that resolves to an array of all the users contained in the database.
+  db.find() 
+    // find(): calling find returns a promise that resolves to an array of all the users contained in the database.
     .then(hubs => {
       res.json(hubs);
     })
@@ -87,8 +88,37 @@ server.get('/api/users', (req, res) => {
     })
 })
 
+// Read - GET - Returns the user object with the specified id.
+server.get('/api/users/:id', (req, res) => {
+  const { id } = req.params;
 
-
+  // When the client makes a GET request to /api/users/:id:
+  db.findById(id)
+    // findById(): this method expects an id as it's only parameter and 
+    // returns the user corresponding to the id provided or an empty array if no user with that id is found.
+    .then(user => {
+      if (user) {
+        res.json(user)
+      
+      // If the user with the specified id is not found:
+      } else {
+        // return HTTP status code 404 (Not Found).
+        res.status(404).json({
+          // return the following JSON object: { message: "The user with the specified ID does not exist." }.
+          message: "The user with the specified ID does not exist."
+        })
+      }
+    })
+    // If there's an error in retrieving the user from the database:
+    .catch(err => {
+      // cancel the request and respond with HTTP status code 500.
+      res.status(500).json({
+        err: err,
+        // return the following JSON object: { error: "The user information could not be retrieved." }.
+        error: "The user information could not be retrieved."
+      })
+    })
+});
 
 // Setup Server Listen, this should be the last step
 server.listen(5000, () => {

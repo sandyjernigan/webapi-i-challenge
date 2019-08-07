@@ -1,9 +1,8 @@
-// GET    /api/users/:id 	Returns the user object with the specified id.
+
 // DELETE /api/users/:id 	Removes the user with the specified id and returns the deleted user.
 // PUT    /api/users/:id 	Updates the user with the specified id using data from the request body. Returns the modified document, NOT the original.
 
 // Database access will be done using the db.js file included inside the data folder. This file publishes the following methods:
-// findById(): this method expects an id as it's only parameter and returns the user corresponding to the id provided or an empty array if no user with that id is found.
 
   // update(): accepts two arguments, the first is the id of the user to update and the second is an object with the changes to apply. 
   // It returns the count of updated records. If the count is 1 it means the record was updated correctly.
@@ -13,16 +12,7 @@
 // Endpoint Specifications
 // ______________________________________________________________________________________________________
 
-// When the client makes a GET request to /api/users/:id:
 
-//     If the user with the specified id is not found:
-//         return HTTP status code 404 (Not Found).
-//         return the following JSON object: { message: "The user with the specified ID does not exist." }.
-
-//     If there's an error in retrieving the user from the database:
-//         cancel the request.
-//         respond with HTTP status code 500.
-//         return the following JSON object: { error: "The user information could not be retrieved." }.
 
 // When the client makes a DELETE request to /api/users/:id:
 
