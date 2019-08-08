@@ -9,6 +9,7 @@ const server = express();
 
 // middleware
 server.use(express.json());
+server.use(cors())
 
 // request handler
 server.get('/', (req, res) => {
@@ -117,66 +118,70 @@ server.put('/api/users/:id', (req, res) => {
   const { id } = req.params;
   const user = req.body;
 
-  // When the client makes a PUT request to /api/users/:id:
-  db.update(id, user)
-    // update(): accepts two arguments, the first is the id of the user to update and the second is an object with the changes to apply. 
-    // It returns the count of updated records. If the count is 1 it means the record was updated correctly.
-    .then(updated => {
-
-      // If the user is found and the new information is valid:
-      if (updated) {
-        // update the user document in the database using the new information sent in the reques body.
-        // return HTTP status code 200 (OK).
-        // return the newly updated user document.
-        res.json(user)
-
-        if (false) { // Error handling
-          // // If the user with the specified id is not found:
-          // if (updated.id != id) {
-          //   // return HTTP status code 404 (Not Found).
-          //   res.status(404).json({
-          //     // return the following JSON object: { message: "The user with the specified ID does not exist." }.
-          //     message: "The user with the specified ID does not exist."
-          //   })
-          // }
-                    
-          // If the request body is missing the name or bio property:
-          // cancel the request.
-          // respond with HTTP status code 400 (Bad Request).
-          // return the following JSON response: { errorMessage: "Please provide name and bio for the user." }.
-        }
+  // If the request body is missing the name or bio property:
+  if(!user.name || !user.bio) {
+    res.status(400).json({
+      errorMessage: "Please provide name and bio for the user."
+    })} else { 
+    
+  db.findById(id)
+    .then(userByID => {
+      if (userByID) { 
+        // When the client makes a PUT request to /api/users/:id:
+        db.update(id, user)
+          // update(): accepts two arguments, the first is the id of the user to update and the second is an object with the changes to apply. 
+          // It returns the count of updated records. If the count is 1 it means the record was updated correctly.
+          .then(updated => {
+            // If the user is found and the new information is valid:
+            if (updated) {
+              // update the user document in the database using the new information sent in the reques body.
+              // return HTTP status code 200 (OK).
+              // return the newly updated user document.
+              res.json(user)
+            } else {
+              res.status(404).json({
+                message: "The user with the specified ID does not exist."
+              })
+            }
+          })
+          // If there's an error when updating the user:
+          .catch(err => {
+            // respond with HTTP status code 500.
+            res.status(500).json({
+              err: err,
+              // return the following JSON object: { error: "The user information could not be modified." }.
+              error: "The user information could not be modified."
+            })
+          })
       } else {
-        res.status(404).json({
-          message: "The user with the specified ID does not exist."
-        })
-      }
-    })
-    // If there's an error when updating the user:
-    .catch(err => {
-      // respond with HTTP status code 500.
-      res.status(500).json({
-        err: err,
-        // return the following JSON object: { error: "The user information could not be modified." }.
-        error: "The user information could not be modified."
-      })
-    })
+        res.status(404).json({ message: "The user with the specified ID does not exist." })
+      }})
+    .catch(err => { res.status(500).json({ err: err, error: "The user information could not be retrieved." })})
+  }
 });
 
 // DELETE - Removes the user with the specified id and returns the deleted user.
 server.delete('/api/users/:id', (req, res) => {
   const { id } = req.params;
 
-  db.remove(id)
-    // remove(): the remove method accepts an id as it's first parameter and upon successfully deleting the user from the database it returns the number of records deleted.
-    .then(deleted => {
-      res.json(deleted);
-    })
-    .catch(err => {
-      res.status(500).json({
-        err: err,
-        error: "The user could not be removed"
-      })
-    })
+  db.findById(id)
+  .then(user => {
+    if (user) { 
+      db.remove(id)
+        // remove(): the remove method accepts an id as it's first parameter and upon successfully deleting the user from the database it returns the number of records deleted.
+        .then(deleted => {
+          res.json(user);
+        })
+        .catch(err => { // If there's an error in removing the user from the database:
+          res.status(500).json({ // respond with HTTP status code 500.
+            err: err,
+            error: "The user could not be removed" // return the following JSON object: { error: "The user could not be removed" }
+          })
+        })
+    } else {
+      res.status(404).json({ message: "The user with the specified ID does not exist." })
+    }})
+  .catch(err => { res.status(500).json({ err: err, error: "The user information could not be retrieved." })})
 });
 
 // Setup Server Listen, this should be the last step

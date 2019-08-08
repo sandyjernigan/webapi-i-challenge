@@ -1,18 +1,3 @@
-// remove(): the remove method accepts an id as it's first parameter and upon successfully deleting the user from the database it returns the number of records deleted.
-
-// When the client makes a DELETE request to /api/users/:id:
-
-//     If the user with the specified id is not found:
-//         return HTTP status code 404 (Not Found).
-//         return the following JSON object: { message: "The user with the specified ID does not exist." }.
-
-//     If there's an error in removing the user from the database:
-//         cancel the request.
-//         respond with HTTP status code 500.
-//         return the following JSON object: { error: "The user could not be removed" }.
-
-
-
 // Stretch Problems
 
 // To work on the stretch problems you'll need to enable the cors middleware. Follow these steps:
