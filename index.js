@@ -28,45 +28,37 @@ server.get('/', (req, res) => {
 server.post('/api/users', (req, res) => {
   const newUser = req.body;
 
-  // When the client makes a POST request to /api/users:
-  db.insert(newUser)
-    // insert(): calling insert passing it a user object will add it to the database and return an object with the id of the inserted user. 
-    // The object looks like this: { id: 123 }
-
-    .then(user => {
-
-      // If the request body is missing the name or bio property:
-      if(!user.name || !user.bio) {
-        // cancel the request and respond with HTTP status code 400 (Bad Request)
-        res.status(400).json({
-          // return the following JSON response: { errorMessage: "Please provide name and bio for the user." }
-          errorMessage: "Please provide name and bio for the user."
-        })
-
-      // If the information about the user is valid:
-      } else if(user) {
-        // save the new user the the database
-        // return HTTP status code 201 (Created)
-        // return the newly created user document
-        res.status(201).json(user)
-
-      // Else
-      } else {
-        res.status(412).json({
-          message: `No Information <img src='https://http.cat/412' alt='Precondition Failed' />`
-        })
-      }
+  // If the request body is missing the name or bio property:
+  if(!newUser.name || !newUser.bio) {
+    // cancel the request and respond with HTTP status code 400 (Bad Request)
+    res.status(400).json({
+      // return the following JSON response: { errorMessage: "Please provide name and bio for the user." }
+      errorMessage: "Please provide name and bio for the user."
     })
-    
-    // If there's an error while saving the user:
-    .catch(err => {
-      // cancel the request and respond with HTTP status code 500 (Server Error)
-      res.status(500).json({
-        err: err,
-        // return the following JSON object: { error: "There was an error while saving the user to the database" }.
-        message: 'failed to create new user'
-      })
-    })
+
+    // If the information about the user is valid:
+    } else { // save the new user the the database
+
+      // When the client makes a POST request to /api/users:
+      db.insert(newUser)
+        // insert(): calling insert passing it a user object will add it to the database and return an object with the id of the inserted user. 
+        // The object looks like this: { id: 123 }
+
+        .then(added => {
+          // return HTTP status code 201 (Created)
+          // return the newly created user document
+          res.status(201).json(newUser)
+        })    
+        // If there's an error while saving the user:
+        .catch(err => {
+          // cancel the request and respond with HTTP status code 500 (Server Error)
+          res.status(500).json({
+            err: err,
+            // return the following JSON object: { error: "There was an error while saving the user to the database" }.
+            message: 'failed to create new user'
+          })
+        })
+    }
 })
 
 // Read - GET - Returns an array of all the user objects contained in the database.
@@ -116,6 +108,73 @@ server.get('/api/users/:id', (req, res) => {
         err: err,
         // return the following JSON object: { error: "The user information could not be retrieved." }.
         error: "The user information could not be retrieved."
+      })
+    })
+});
+
+// Update - PUT - Updates the user with the specified id using data from the request body. Returns the modified document, NOT the original.
+server.put('/api/users/:id', (req, res) => {
+  const { id } = req.params;
+  const user = req.body;
+
+  // When the client makes a PUT request to /api/users/:id:
+  db.update(id, user)
+    // update(): accepts two arguments, the first is the id of the user to update and the second is an object with the changes to apply. 
+    // It returns the count of updated records. If the count is 1 it means the record was updated correctly.
+    .then(updated => {
+
+      // If the user is found and the new information is valid:
+      if (updated) {
+        // update the user document in the database using the new information sent in the reques body.
+        // return HTTP status code 200 (OK).
+        // return the newly updated user document.
+        res.json(user)
+
+        if (false) { // Error handling
+          // // If the user with the specified id is not found:
+          // if (updated.id != id) {
+          //   // return HTTP status code 404 (Not Found).
+          //   res.status(404).json({
+          //     // return the following JSON object: { message: "The user with the specified ID does not exist." }.
+          //     message: "The user with the specified ID does not exist."
+          //   })
+          // }
+                    
+          // If the request body is missing the name or bio property:
+          // cancel the request.
+          // respond with HTTP status code 400 (Bad Request).
+          // return the following JSON response: { errorMessage: "Please provide name and bio for the user." }.
+        }
+      } else {
+        res.status(404).json({
+          message: "The user with the specified ID does not exist."
+        })
+      }
+    })
+    // If there's an error when updating the user:
+    .catch(err => {
+      // respond with HTTP status code 500.
+      res.status(500).json({
+        err: err,
+        // return the following JSON object: { error: "The user information could not be modified." }.
+        error: "The user information could not be modified."
+      })
+    })
+});
+
+// DELETE - Removes the user with the specified id and returns the deleted user.
+server.delete('/api/users/:id', (req, res) => {
+  const { id } = req.params;
+
+  db.remove(id)
+    // remove(): the remove method accepts an id as it's first parameter and upon successfully deleting the user from the database it returns the number of records deleted.
+    .then(deleted => {
+      res.json(deleted);
+    })
+    .catch(err => {
+      res.status(500).json({
+        err: err,
+        error: "The user could not be removed"
       })
     })
 });
